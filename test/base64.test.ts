@@ -1,0 +1,246 @@
+import t from 'tap'
+import * as Base64 from '../lib/base64'
+
+const CUSTOMCHARSET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/='
+const decoded = {
+  default: ['Zm9vYmFyYmF6', 'Zm9vYg=='],
+  url: ['Zm9vYmFyYmF6', 'Zm9vYg'],
+  custom: ['zM9VyMfYyMf6', 'zM9VyG==']
+}
+const encoded = {
+  string: ['foobarbaz', 'foob'],
+  buffer: [] as Buffer[],
+  Uint8Array: [] as Uint8Array[]
+}
+encoded.buffer = [Buffer.from(encoded.string[0]), Buffer.from(encoded.string[1])]
+encoded.Uint8Array = [new Uint8Array(encoded.buffer[0]), new Uint8Array(encoded.buffer[1])]
+
+t.plan(12)
+
+t.test('encode(*)', function (t) {
+  t.plan(6)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[0]), decoded.default[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[1]), decoded.default[1])
+  })
+
+  t.test('Buffer(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[0]), decoded.default[0])
+  })
+
+  t.test('Buffer(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[1]), decoded.default[1])
+  })
+
+  t.test('Uint8Array(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[0]), decoded.default[0])
+  })
+
+  t.test('Uint8Array(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[1]), decoded.default[1])
+  })
+})
+
+t.test('encode(*, "url")', function (t) {
+  t.plan(6)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[0], 'url'), decoded.url[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[1], 'url'), decoded.url[1])
+  })
+
+  t.test('Buffer(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[0], 'url'), decoded.url[0])
+  })
+
+  t.test('Buffer(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[1], 'url'), decoded.url[1])
+  })
+
+  t.test('Uint8Array(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[0], 'url'), decoded.url[0])
+  })
+
+  t.test('Uint8Array(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[1], 'url'), decoded.url[1])
+  })
+})
+
+t.test('encode(*, "custom", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=")', function (t) {
+  t.plan(6)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[0], 'custom', CUSTOMCHARSET), decoded.custom[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.string[1], 'custom', CUSTOMCHARSET), decoded.custom[1])
+  })
+
+  t.test('Buffer(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[0], 'custom', CUSTOMCHARSET), decoded.custom[0])
+  })
+
+  t.test('Buffer(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.buffer[1], 'custom', CUSTOMCHARSET), decoded.custom[1])
+  })
+
+  t.test('Uint8Array(foobarbaz)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[0], 'custom', CUSTOMCHARSET), decoded.custom[0])
+  })
+
+  t.test('Uint8Array(foob)', function (t) {
+    t.plan(1)
+    t.equal(Base64.encode(encoded.Uint8Array[1], 'custom', CUSTOMCHARSET), decoded.custom[1])
+  })
+})
+
+t.test('encodeReplaceCharset(*)', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[0]), decoded.default[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[1]), decoded.default[1])
+  })
+})
+
+t.test('encodeReplaceCharset(*, "url")', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[0], 'url'), decoded.url[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[1], 'url'), decoded.url[1])
+  })
+})
+
+t.test('encodeReplaceCharset(*, "custom", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=")', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[0], 'custom', CUSTOMCHARSET), decoded.custom[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.encodeReplaceCharset(decoded.default[1], 'custom', CUSTOMCHARSET), decoded.custom[1])
+  })
+})
+
+t.test('decode(*)', function (t) {
+  t.plan(2)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.default[0]), encoded.string[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.default[1]), encoded.string[1])
+  })
+})
+
+t.test('encode(*, "url")', function (t) {
+  t.plan(2)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.url[0], 'url'), encoded.string[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.url[1], 'url'), encoded.string[1])
+  })
+})
+
+t.test('decode(*, "custom", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=")', function (t) {
+  t.plan(2)
+
+  t.test('foobarbaz', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.custom[0], 'custom', CUSTOMCHARSET), encoded.string[0])
+  })
+
+  t.test('foob', function (t) {
+    t.plan(1)
+    t.equal(Base64.decode(decoded.custom[1], 'custom', CUSTOMCHARSET), encoded.string[1])
+  })
+})
+
+t.test('decodeReplaceCharset(*)', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.default[0]), decoded.default[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.default[1]), decoded.default[1])
+  })
+})
+
+t.test('decodeReplaceCharset(*, "url")', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.url[0], 'url'), decoded.default[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.url[1], 'url'), decoded.default[1])
+  })
+})
+
+t.test('decodeReplaceCharset(*, "custom", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=")', function (t) {
+  t.plan(2)
+
+  t.test('Zm9vYmFyYmF6', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.custom[0], 'custom', CUSTOMCHARSET), decoded.default[0])
+  })
+
+  t.test('Zm9vYg==', function (t) {
+    t.plan(1)
+    t.equal(Base64.decodeReplaceCharset(decoded.custom[1], 'custom', CUSTOMCHARSET), decoded.default[1])
+  })
+})
