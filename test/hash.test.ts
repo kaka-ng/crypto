@@ -2,7 +2,7 @@
 import t from 'tap'
 import * as Hash from '../lib/hash'
 
-t.plan(6)
+t.plan(9)
 
 t.test('hash', function (t) {
   t.plan(2)
@@ -78,6 +78,20 @@ t.test('sha256', function (t) {
   })
 })
 
+t.test('sha384', function (t) {
+  t.plan(2)
+
+  t.test('sha384(foo)', function (t) {
+    t.plan(1)
+    t.equal(Hash.sha384('foo'), '98c11ffdfdd540676b1a137cb1a22b2a70350c9a44171d6b1180c6be5cbb2ee3f79d532c8a1dd9ef2e8e08e752a3babb')
+  })
+
+  t.test('sha384(foo, base64)', function (t) {
+    t.plan(1)
+    t.equal(Hash.sha384('foo', 'base64'), 'mMEf/f3VQGdrGhN8saIrKnA1DJpEFx1rEYDGvly7LuP3nVMsih3Z7y6OCOdSo7q7')
+  })
+})
+
 t.test('sha512', function (t) {
   t.plan(2)
 
@@ -92,6 +106,42 @@ t.test('sha512', function (t) {
     t.plan(1)
     t.equal(Hash.sha512('foo', 'base64'),
       '9/u6bgY2+JDlb7vzKD5STG+jIErimDgtYkdB0NxmODJuKCxBvl5CVNiCB3LFUYosWowMf37aGVlKfrU5RT4e1w=='
+    )
+  })
+})
+
+t.test('shake128', function (t) {
+  t.plan(2)
+
+  t.test('shake128(foo)', function (t) {
+    t.plan(1)
+    t.equal(Hash.shake128('foo'),
+      'f84e95cb5fbd2038863ab27d3cdeac29'
+    )
+  })
+
+  t.test('shake128(foo, base64)', function (t) {
+    t.plan(1)
+    t.equal(Hash.shake128('foo', 'base64'),
+      '+E6Vy1+9IDiGOrJ9PN6sKQ=='
+    )
+  })
+})
+
+t.test('shake256', function (t) {
+  t.plan(2)
+
+  t.test('shake256(foo)', function (t) {
+    t.plan(1)
+    t.equal(Hash.shake256('foo'),
+      '1af97f7818a28edfdfce5ec66dbdc7e871813816d7d585fe1f12475ded5b6502'
+    )
+  })
+
+  t.test('shake256(foo, base64)', function (t) {
+    t.plan(1)
+    t.equal(Hash.shake256('foo', 'base64'),
+      'Gvl/eBiijt/fzl7Gbb3H6HGBOBbX1YX+HxJHXe1bZQI='
     )
   })
 })
