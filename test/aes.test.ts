@@ -4,7 +4,7 @@ import * as AES from '../lib/aes'
 t.plan(3)
 
 t.test('computeKeySize()', function (t) {
-  t.plan(7)
+  t.plan(8)
 
   t.test('default', function (t) {
     t.plan(1)
@@ -19,6 +19,11 @@ t.test('computeKeySize()', function (t) {
   t.test('aes-256-gcm', function (t) {
     t.plan(1)
     t.equal(AES.computeKeySize('aes-256-gcm'), 32)
+  })
+
+  t.test('chacha20-poly1305', function (t) {
+    t.plan(1)
+    t.equal(AES.computeKeySize('chacha20-poly1305'), 32)
   })
 
   t.test('aes-192-ccm', function (t) {
@@ -43,7 +48,7 @@ t.test('computeKeySize()', function (t) {
 })
 
 t.test('encrypt()', function (t) {
-  t.plan(2)
+  t.plan(3)
   const SECRET = 'bar'
   const SALT = 'baz'
 
@@ -66,10 +71,20 @@ t.test('encrypt()', function (t) {
     t.equal('secret' in encrypted, true)
     t.equal('salt' in encrypted, true)
   })
+
+  t.test('encrypt(foo, chacha20-poly1305, bar, baz)', function (t) {
+    t.plan(5)
+    const encrypted = AES.encrypt('foo', 'chacha20-poly1305', SECRET, SALT)
+    t.equal('value' in encrypted, true)
+    t.equal('iv' in encrypted, true)
+    t.equal('authTag' in encrypted, true)
+    t.equal('secret' in encrypted, true)
+    t.equal('salt' in encrypted, true)
+  })
 })
 
 t.test('decrypt()', function (t) {
-  t.plan(4)
+  t.plan(5)
 
   t.test('decrypt(foo)', function (t) {
     t.plan(1)
@@ -121,6 +136,20 @@ t.test('decrypt()', function (t) {
       Buffer.from(encrypted.iv, 'hex'),
       Buffer.from(encrypted.authTag, 'hex'),
       'aes-256-gcm',
+      encrypted.secret,
+      encrypted.salt
+    )
+    t.equal(decrypted, 'foo')
+  })
+
+  t.test('decrypt(foo, chacha20-poly1305)', function (t) {
+    t.plan(1)
+    const encrypted = AES.encrypt('foo', 'chacha20-poly1305')
+    const decrypted = AES.decrypt(
+      encrypted.value,
+      Buffer.from(encrypted.iv, 'hex'),
+      Buffer.from(encrypted.authTag, 'hex'),
+      'chacha20-poly1305',
       encrypted.secret,
       encrypted.salt
     )

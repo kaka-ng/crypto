@@ -1,7 +1,7 @@
-import * as crypto from 'crypto'
+import { BinaryLike, CipherCCMTypes, CipherGCM, CipherGCMTypes, createCipheriv, createDecipheriv, DecipherGCM, scryptSync } from 'crypto'
 import { randomBytes } from './utils'
 
-export function computeKeySize (algorithm: crypto.CipherCCMTypes | crypto.CipherGCMTypes = 'aes-256-gcm'): number {
+export function computeKeySize (algorithm: CipherCCMTypes | CipherGCMTypes = 'aes-256-gcm'): number {
   switch (algorithm) {
     case 'aes-128-ccm':
     case 'aes-128-gcm':
@@ -11,8 +11,24 @@ export function computeKeySize (algorithm: crypto.CipherCCMTypes | crypto.Cipher
       return 24
     case 'aes-256-ccm':
     case 'aes-256-gcm':
+    case 'chacha20-poly1305':
     default:
       return 32
+  }
+}
+
+export function computeIVSize (algorithm: CipherCCMTypes | CipherGCMTypes = 'aes-256-gcm'): number {
+  switch (algorithm) {
+    case 'chacha20-poly1305':
+      return 12
+    case 'aes-128-ccm':
+    case 'aes-128-gcm':
+    case 'aes-192-ccm':
+    case 'aes-192-gcm':
+    case 'aes-256-ccm':
+    case 'aes-256-gcm':
+    default:
+      return 16
   }
 }
 
@@ -20,19 +36,22 @@ export interface EncryptionResult {
   value: string
   iv: string
   authTag: string
-  secret: crypto.BinaryLike
-  salt: crypto.BinaryLike
+  secret: BinaryLike
+  salt: BinaryLike
 }
 
 export function encrypt (
   token: string,
-  algorithm: crypto.CipherCCMTypes | crypto.CipherGCMTypes = 'aes-256-gcm',
-  secret: crypto.BinaryLike = randomBytes(32, 'hex'),
-  salt: crypto.BinaryLike = randomBytes(32, 'hex')
+  algorithm: CipherCCMTypes | CipherGCMTypes = 'aes-256-gcm',
+  secret: BinaryLike = randomBytes(32, 'hex'),
+  salt: BinaryLike = randomBytes(32, 'hex'),
+  authTagLength = 16
 ): EncryptionResult {
-  const key: Buffer = crypto.scryptSync(secret, salt, computeKeySize(algorithm))
-  const iv: Buffer = Buffer.alloc(16, randomBytes(16), 'binary')
-  const cipher: crypto.CipherGCM = crypto.createCipheriv(algorithm, key, iv) as crypto.CipherGCM
+  const key: Buffer = scryptSync(secret, salt, computeKeySize(algorithm))
+  const ivSize = computeIVSize(algorithm)
+  const iv: Buffer = Buffer.alloc(ivSize, randomBytes(ivSize), 'binary')
+  const option: any = [algorithm, key, iv, { authTagLength }]
+  const cipher: CipherGCM = createCipheriv.apply(createCipheriv, option) as CipherGCM
   cipher.setAAD(Buffer.from(`${String(secret)}${String(salt)}`))
 
   let value = cipher.update(token, 'utf8', 'hex')
@@ -50,12 +69,14 @@ export function decrypt (
   encrypted: string,
   iv: Buffer,
   authTag: Buffer,
-  algorithm: crypto.CipherCCMTypes | crypto.CipherGCMTypes,
-  secret: crypto.BinaryLike,
-  salt: crypto.BinaryLike
+  algorithm: CipherCCMTypes | CipherGCMTypes,
+  secret: BinaryLike,
+  salt: BinaryLike,
+  authTagLength = 16
 ): string {
-  const key: Buffer = crypto.scryptSync(secret, salt, computeKeySize(algorithm))
-  const decipher = crypto.createDecipheriv(algorithm, key, iv) as crypto.DecipherGCM
+  const key: Buffer = scryptSync(secret, salt, computeKeySize(algorithm))
+  const option: any = [algorithm, key, iv, { authTagLength }]
+  const decipher = createDecipheriv.apply(createDecipheriv, option) as DecipherGCM
   decipher.setAAD(Buffer.from(`${String(secret)}${String(salt)}`))
   decipher.setAuthTag(authTag)
 
