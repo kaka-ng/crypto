@@ -12,3 +12,7 @@ export function randomBytes (size: number, encoding: RandomBytesEncode = 'buffer
     return randomBytes.toString(encoding)
   }
 }
+
+export function randomUUID (): string {
+  return crypto.randomUUID()
+}
