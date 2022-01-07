@@ -1,7 +1,7 @@
 import t from 'tap'
 import * as AES from '../lib/aes'
 
-t.plan(3)
+t.plan(4)
 
 t.test('computeKeySize()', function (t) {
   t.plan(8)
@@ -44,6 +44,50 @@ t.test('computeKeySize()', function (t) {
   t.test('aes-128-gcm', function (t) {
     t.plan(1)
     t.equal(AES.computeKeySize('aes-128-gcm'), 16)
+  })
+})
+
+t.test('computeIVSize()', function (t) {
+  t.plan(8)
+
+  t.test('default', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize(), 16)
+  })
+
+  t.test('aes-256-ccm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-256-ccm'), 16)
+  })
+
+  t.test('aes-256-gcm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-256-gcm'), 16)
+  })
+
+  t.test('chacha20-poly1305', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('chacha20-poly1305'), 12)
+  })
+
+  t.test('aes-192-ccm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-192-ccm'), 16)
+  })
+
+  t.test('aes-192-gcm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-192-gcm'), 16)
+  })
+
+  t.test('aes-128-ccm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-128-ccm'), 16)
+  })
+
+  t.test('aes-128-gcm', function (t) {
+    t.plan(1)
+    t.equal(AES.computeIVSize('aes-128-gcm'), 16)
   })
 })
 
