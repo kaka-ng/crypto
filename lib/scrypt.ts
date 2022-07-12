@@ -1,4 +1,4 @@
-import { randomBytes, scrypt } from 'crypto'
+import { randomBytes, scrypt, timingSafeEqual } from 'crypto'
 
 export async function hash (value: string, keylen = 32, cost = 65536, blockSize = 8, parallelization = 1): Promise<string> {
   // salt is limited to at least 16 bytes long
@@ -26,7 +26,7 @@ export async function compare (value: string, hashed: string): Promise<boolean> 
     }, function (error, key) {
       /* istanbul ignore next */
       if (error !== null) reject(error)
-      resolve(key.toString('base64url') === hash)
+      resolve(timingSafeEqual(key, Buffer.from(hash, 'base64url')))
     })
   })
 }
