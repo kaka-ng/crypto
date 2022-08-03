@@ -1,8 +1,8 @@
 
 import t from 'tap'
-import { randomBytes, randomUUID } from '../lib/utils'
+import { randomBytes, randomNum, randomUUID } from '../lib/utils'
 
-t.plan(2)
+t.plan(3)
 
 t.test('randomBytes()', function (t) {
   t.plan(2)
@@ -21,6 +21,26 @@ t.test('randomBytes()', function (t) {
 
     t.equal(typeof result, 'string')
     t.equal(result.length, 32)
+  })
+})
+
+t.test('randomNum()', function (t) {
+  t.plan(2)
+
+  t.test('randomNum()', function (t) {
+    t.plan(2)
+    const result = randomNum()
+
+    t.equal(typeof result, 'string')
+    t.equal(result.length, 6)
+  })
+
+  t.test('randomNum(8)', function (t) {
+    t.plan(2)
+    const result = randomNum(8)
+
+    t.equal(typeof result, 'string')
+    t.equal(result.length, 8)
   })
 })
 

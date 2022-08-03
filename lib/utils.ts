@@ -13,6 +13,10 @@ export function randomBytes (size: number, encoding: RandomBytesEncode = 'buffer
   }
 }
 
+export function randomNum (digit: number = 6): string {
+  return crypto.randomInt(0, Math.pow(10, digit)).toString().padStart(digit, '0')
+}
+
 export function randomUUID (): string {
   return crypto.randomUUID()
 }
