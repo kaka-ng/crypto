@@ -1,4 +1,4 @@
-import { BinaryLike, CipherCCMTypes, CipherGCM, CipherGCMTypes, createCipheriv, createDecipheriv, DecipherGCM, scryptSync } from 'crypto'
+import { createCipheriv, createDecipheriv, scryptSync, type BinaryLike, type CipherCCMTypes, type CipherGCM, type CipherGCMTypes, type DecipherGCM } from 'crypto'
 import { randomBytes } from './utils'
 
 export function computeKeySize (algorithm: CipherCCMTypes | CipherGCMTypes = 'aes-256-gcm'): number {
@@ -57,11 +57,11 @@ export function encrypt (
   let value = cipher.update(token, 'utf8', 'hex')
   value += cipher.final('hex')
   return {
-    value: value,
+    value,
     iv: iv.toString('hex'),
     authTag: cipher.getAuthTag().toString('hex'),
-    secret: secret,
-    salt: salt
+    secret,
+    salt
   }
 }
 

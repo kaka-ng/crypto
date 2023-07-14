@@ -1,4 +1,4 @@
-import { BinaryLike, BinaryToTextEncoding, createHash } from 'crypto'
+import { createHash, type BinaryLike, type BinaryToTextEncoding } from 'crypto'
 
 export function hash (
   value: BinaryLike,
